@@ -1,48 +1,44 @@
 #!/bin/bash
 
-# 1. Update system and install Java 21 (Required for Jenkins 2.555.1+)
+# 1. Update system and install Java 21
+# Jenkins requires Java; OpenJDK 21 is the current standard for Jenkins 2.555.1+
 sudo apt update
-sudo apt install fontconfig openjdk-21-jre 
+sudo apt install -y fontconfig openjdk-21-jre 
+
 # 2. Jenkins Installation
-# Download the latest keyring and add the repository
+# Ensure the keyring directory exists
+sudo mkdir -p /etc/apt/keyrings
+
+# Download the 2026 Jenkins GPG key
 sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
   https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+
+# Add the signed repository to your sources
 echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
   https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
   /etc/apt/sources.list.d/jenkins.list > /dev/null
 
+# Update repository list and install Jenkins
+sudo apt update
+sudo apt install -y jenkins
 
-sudo apt-get update
-sudo apt-get install -y jenkins
+# Start and enable Jenkins service
 sudo systemctl enable --now jenkins
 
 # 3. Docker Installation & Permissions
-sudo apt-get install -y docker.io
+# Installing docker.io and setting permissions for the Jenkins user
+sudo apt install -y docker.io
 sudo usermod -aG docker $USER
 sudo usermod -aG docker jenkins
+
 # Restart services to apply group changes
 sudo systemctl restart docker
 sudo systemctl restart jenkins
 
-# 4. Trivy Installation (Modern Repository Method)
-# Create keyring directory and import the key securely
-sudo mkdir -p /usr/share/keyrings
-wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
-
-# Add Trivy repository with the signed-by flag
-echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
-
-sudo apt-get update
-sudo apt-get install -y trivy
-
-# 5. Cloud Tools (AWS CLI & Helm)
-sudo apt-get install -y snapd
-sudo snap install aws-cli --classic
-sudo snap install helm --classic
-
-# Print Versions to confirm success
-echo "Installation Complete!"
-java -version
-jenkins --version
-trivy --version
-docker --version
+# Final output for ease of use
+echo "-------------------------------------------------------"
+echo "Jenkins installation complete!"
+echo "Access the UI at: http://$(hostname -I | awk '{print $1}'):8080"
+echo "Your initial Admin Password is:"
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+echo "-------------------------------------------------------"
