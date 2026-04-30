@@ -23,7 +23,7 @@ sudo apt update
 sudo apt install -y jenkins
 
 # Start and enable Jenkins service
-sudo systemctl enable --now jenkins
+sudo systemctl enable jenkins
 
 # 3. Docker Installation & Permissions
 # Installing docker.io and setting permissions for the Jenkins user
