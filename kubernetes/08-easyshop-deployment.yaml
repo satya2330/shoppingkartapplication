@@ -16,7 +16,7 @@ spec:
       containers:
         - name: easyshop
           # Updated to your Docker Hub username so the Jenkins Shared Library can find it
-          image: stephcurry30/easyshop-app:latest 
+          image: stephcurry30/easyshop-app:8
           imagePullPolicy: Always
           ports:
             - containerPort: 3000

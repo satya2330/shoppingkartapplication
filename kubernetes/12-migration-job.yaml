@@ -9,7 +9,7 @@ spec:
       containers:
       - name: migration
         # Updated to match your Docker Hub username
-        image: stephcurry30/easyshop-migration:latest 
+        image: stephcurry30/easyshop-migration:8
         imagePullPolicy: Always
         env:
         - name: MONGODB_URI
